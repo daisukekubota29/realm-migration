@@ -8,37 +8,55 @@
 
 import UIKit
 import RealmSwift
+import RxSwift
 
 class ViewController: UIViewController {
+
+    private let disposeBag = DisposeBag()
 
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
-        migrate()
+        migrate().subscribeOn(SerialDispatchQueueScheduler(qos: .background))
+            .observeOn(MainScheduler.instance)
+            .subscribe(onNext: { result in
+                debugPrint("result: \(result)")
+            }, onError: { error in
+                debugPrint(error)
+            }, onCompleted: {
+                debugPrint("completed")
+            }, onDisposed: nil)
+            .disposed(by: disposeBag)
     }
 
 }
 
 extension ViewController {
-    func migrate() {
-        let minimumVersion: UInt64 = 2
-        let version: UInt64 = 3
-        let configuration = Realm.Configuration(schemaVersion: version,
-                                                migrationBlock: { migration, oldVersion in
-                                                    debugPrint("Thread.isMainThread: \(Thread.isMainThread)")
-                                                    debugPrint("oldVersion: \(oldVersion), version: \(version)")
-                                                    if oldVersion < minimumVersion {
-                                                        self.deleteOldSchemas(migration: migration)
-                                                        return
-                                                    }
-                                                })
-        Realm.Configuration.defaultConfiguration = configuration
-        Realm.asyncOpen { _, error in
-            guard let error = error else {
-                debugPrint("migration success!")
-                return
+    func migrate() -> Observable<Bool> {
+        return Observable.create { observer -> Disposable in
+            let minimumVersion: UInt64 = 2
+            let version: UInt64 = 3
+            let configuration = Realm.Configuration(schemaVersion: version,
+                                                    migrationBlock: { migration, oldVersion in
+                                                        debugPrint("Thread.isMainThread: \(Thread.isMainThread)")
+                                                        debugPrint("oldVersion: \(oldVersion), version: \(version)")
+                                                        observer.on(.next(true))
+                                                        if oldVersion < minimumVersion {
+                                                            self.deleteOldSchemas(migration: migration)
+                                                            return
+                                                        }
+                                                    })
+            Realm.Configuration.defaultConfiguration = configuration
+            Realm.asyncOpen { _, error in
+                guard let error = error else {
+                    debugPrint("migration success!")
+                    observer.on(.completed)
+                    return
+                }
+                debugPrint(error)
+                observer.on(.error(error))
             }
-            debugPrint(error)
+            return Disposables.create()
         }
     }
 
