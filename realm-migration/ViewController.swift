@@ -32,6 +32,10 @@ extension ViewController {
                                                         if oldVersion < minimumVersion {
                                                             for schema in migration.oldSchema.objectSchema {
                                                                 debugPrint("schema: \(schema.className)")
+                                                                if !schema.className.starts(with: "__") {
+                                                                    debugPrint("ok")
+                                                                    migration.deleteData(forType: schema.className)
+                                                                }
                                                                 migration.enumerateObjects(ofType: schema.className, { oldObject, newObject in
                                                                     debugPrint("oldObject: \(oldObject)")
                                                                 })
