@@ -19,23 +19,25 @@ class ViewController: UIViewController {
 
 }
 
-
 extension ViewController {
     func migrate() {
         let minimumVersion: UInt64 = 2
-        let version: UInt64 = 2
-        do {
-            let configuration = Realm.Configuration(schemaVersion: version,
-                                                    migrationBlock: { migration, oldVersion in
-                                                        debugPrint("oldVersion: \(oldVersion), version: \(version)")
-                                                        if oldVersion < minimumVersion {
-                                                            self.deleteOldSchemas(migration: migration)
-                                                            return
-                                                        }
-                                                    })
-            Realm.Configuration.defaultConfiguration = configuration
-            _ = try Realm()
-        } catch let error {
+        let version: UInt64 = 3
+        let configuration = Realm.Configuration(schemaVersion: version,
+                                                migrationBlock: { migration, oldVersion in
+                                                    debugPrint("Thread.isMainThread: \(Thread.isMainThread)")
+                                                    debugPrint("oldVersion: \(oldVersion), version: \(version)")
+                                                    if oldVersion < minimumVersion {
+                                                        self.deleteOldSchemas(migration: migration)
+                                                        return
+                                                    }
+                                                })
+        Realm.Configuration.defaultConfiguration = configuration
+        Realm.asyncOpen { _, error in
+            guard let error = error else {
+                debugPrint("migration success!")
+                return
+            }
             debugPrint(error)
         }
     }

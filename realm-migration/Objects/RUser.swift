@@ -13,6 +13,8 @@ class RUser: Object {
     @objc dynamic var id: String = ""
     /// Name
     @objc dynamic var name: String = ""
+    /// Gender
+    @objc dynamic var gender: String = ""
 
     override class func primaryKey() -> String? {
         return "id"
