@@ -28,17 +28,12 @@ extension ViewController {
             let configuration = Realm.Configuration(schemaVersion: version,
                                                     migrationBlock: { migration, oldVersion in
                                                         debugPrint("oldVersion: \(oldVersion), version: \(version)")
-//                                                        debugPrint("newScheme: \(migration.newSchema)")
+                                                        debugPrint("newScheme: \(migration.newSchema)")
                                                         if oldVersion < minimumVersion {
                                                             for schema in migration.oldSchema.objectSchema {
-                                                                debugPrint("schema: \(schema.className)")
                                                                 if !schema.className.starts(with: "__") {
-                                                                    debugPrint("ok")
                                                                     migration.deleteData(forType: schema.className)
                                                                 }
-                                                                migration.enumerateObjects(ofType: schema.className, { oldObject, newObject in
-                                                                    debugPrint("oldObject: \(oldObject)")
-                                                                })
                                                             }
 
                                                             return
