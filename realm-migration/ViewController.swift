@@ -22,12 +22,20 @@ class ViewController: UIViewController {
 
 extension ViewController {
     func migrate() {
-        let version: UInt64 = 0
+        let minimumVersion: UInt64 = 2
+        let version: UInt64 = 2
         do {
             let configuration = Realm.Configuration(schemaVersion: version,
                                                     migrationBlock: { migration, oldVersion in
                                                         debugPrint("oldVersion: \(oldVersion), version: \(version)")
-                                                        debugPrint("newScheme: \(migration.newSchema)")
+//                                                        debugPrint("newScheme: \(migration.newSchema)")
+                                                        if oldVersion < minimumVersion {
+                                                            for schema in migration.oldSchema.objectSchema {
+                                                                debugPrint("schema: \(schema.className)")
+//                                                                migration.deleteData(forType: schema)
+                                                            }
+                                                            return
+                                                        }
                                                     })
             Realm.Configuration.defaultConfiguration = configuration
             _ = try Realm()
