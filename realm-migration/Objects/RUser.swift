@@ -9,12 +9,7 @@
 import Foundation
 import RealmSwift
 
-<<<<<<< HEAD:realm-migration/Objects/RUser.swift
 class RUser: Object {
-=======
-class User: Object {
-    /// ID
->>>>>>> v1:realm-migration/Objects/User.swift
     @objc dynamic var id: String = ""
     /// Name
     @objc dynamic var name: String = ""

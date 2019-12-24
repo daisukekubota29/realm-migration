@@ -1,5 +1,5 @@
 //
-//  Article.swift
+//  RArticle.swift
 //  realm-migration
 //
 //  Created by Daisuke Kubota on 2019/12/24.
@@ -9,15 +9,19 @@
 import Foundation
 import RealmSwift
 
-class Article: Object {
+class RArticle: Object {
     /// ID
     @objc dynamic var id: String = ""
     /// Owner
-    @objc dynamic var owner: User?
+    @objc dynamic var owner: RUser?
     /// Categories
-    let categories = List<Category>()
+    let categories = List<RCategory>()
     /// Title
     @objc dynamic var title: String = ""
     /// Body
     @objc dynamic var body: String = ""
+
+    override class func primaryKey() -> String? {
+        return "id"
+    }
 }
