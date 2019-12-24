@@ -28,9 +28,8 @@ extension ViewController {
             let configuration = Realm.Configuration(schemaVersion: version,
                                                     migrationBlock: { migration, oldVersion in
                                                         debugPrint("oldVersion: \(oldVersion), version: \(version)")
-                                                        debugPrint("newScheme: \(migration.newSchema)")
                                                         if oldVersion < minimumVersion {
-                                                            self.deleteUnknownObject(migration: migration)
+                                                            self.deleteOldSchemas(migration: migration)
                                                             return
                                                         }
                                                     })
@@ -41,11 +40,19 @@ extension ViewController {
         }
     }
 
+    private func deleteOldSchemas(migration: Migration) {
+        migration.oldSchema
+            .objectSchema
+            .map { $0.className }
+            .filter { !$0.starts(with: "__") }
+            .forEach { migration.deleteData(forType: $0) }
+    }
+
     private func deleteUnknownObject(migration: Migration) {
         let objectNames = migration.newSchema.objectSchema.map { $0.className }
         let deletedObjectNames = migration.oldSchema
             .objectSchema
-            .filter { !objectNames.contains($0.className) }
+            .filter { !objectNames.contains($0.className) && !$0.className.starts(with: "__") }
             .map { $0.className }
         debugPrint("objectNames: \(objectNames)")
         debugPrint("deletedObjectNames: \(deletedObjectNames)")
