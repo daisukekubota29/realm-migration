@@ -8,6 +8,9 @@ target 'realm-migration' do
   # Pods for realm-migration
   pod 'RealmSwift'
 
+  pod 'RxSwift'
+  pod 'RxCocoa'
+
   target 'realm-migrationTests' do
     inherit! :search_paths
     # Pods for testing
