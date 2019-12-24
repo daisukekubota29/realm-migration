@@ -22,7 +22,7 @@ class ViewController: UIViewController {
 
 extension ViewController {
     func migrate() {
-        let version: UInt64 = 0
+        let version: UInt64 = 1
         do {
             let configuration = Realm.Configuration(schemaVersion: version,
                                                     migrationBlock: { migration, oldVersion in
