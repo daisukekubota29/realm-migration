@@ -1,5 +1,5 @@
 //
-//  User.swift
+//  Category.swift
 //  realm-migration
 //
 //  Created by Daisuke Kubota on 2019/12/24.
@@ -9,9 +9,9 @@
 import Foundation
 import RealmSwift
 
-class User: Object {
+class Category: Object {
     /// ID
-    @objc dynamic var id: String = ""
+    @objc dynamic var id: String =  ""
     /// Name
     @objc dynamic var name: String = ""
 }
