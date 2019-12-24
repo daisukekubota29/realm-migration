@@ -30,12 +30,7 @@ extension ViewController {
                                                         debugPrint("oldVersion: \(oldVersion), version: \(version)")
                                                         debugPrint("newScheme: \(migration.newSchema)")
                                                         if oldVersion < minimumVersion {
-                                                            for schema in migration.oldSchema.objectSchema {
-                                                                if !schema.className.starts(with: "__") {
-                                                                    migration.deleteData(forType: schema.className)
-                                                                }
-                                                            }
-
+                                                            self.deleteUnknownObject(migration: migration)
                                                             return
                                                         }
                                                     })
@@ -44,5 +39,16 @@ extension ViewController {
         } catch let error {
             debugPrint(error)
         }
+    }
+
+    private func deleteUnknownObject(migration: Migration) {
+        let objectNames = migration.newSchema.objectSchema.map { $0.className }
+        let deletedObjectNames = migration.oldSchema
+            .objectSchema
+            .filter { !objectNames.contains($0.className) }
+            .map { $0.className }
+        debugPrint("objectNames: \(objectNames)")
+        debugPrint("deletedObjectNames: \(deletedObjectNames)")
+        deletedObjectNames.forEach { migration.deleteData(forType: $0) }
     }
 }
